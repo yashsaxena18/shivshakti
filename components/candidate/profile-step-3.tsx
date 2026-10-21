@@ -1,3 +1,6 @@
+//components/candidate/profile-step-3.tsx
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 type JobCategories = Record<string, string[]>;
 
 type Props = {
@@ -184,78 +187,39 @@ export default function ProfileStep3({
           )}
         </div>
 
-        {/* Job Field - First Dropdown */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold">
-            Job Field
-          </label>
+        {/* Job Field - Searchable Dropdown */}
+        <SearchableSelect
+          id="job-field"
+          label="Job Field"
+          required
+          value={selectedJobField}
+          onChange={(val) => onJobFieldChange(val)}
+          options={jobCategoryNames}
+          placeholder="Select or search Job Field..."
+          searchPlaceholder="Type to search Job Field (e.g. Pharma, IT, Accounts)..."
+          error={errors.selectedJobField}
+          emptyMessage="No job fields found matching your search"
+        />
 
-          <select
-            value={selectedJobField}
-            onChange={(e) =>
-              onJobFieldChange(e.target.value)
-            }
-            className={`h-11 w-full rounded-xl border bg-white px-3 transition-all duration-200 focus:outline-none dark:bg-zinc-900 ${
-              errors.selectedJobField
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                : "border-zinc-300 focus:border-black focus:ring-2 focus:ring-zinc-300 dark:border-zinc-700"
-            }`}
-          >
-            <option value="">
-              Select Job Field
-            </option>
-
-            {jobCategoryNames.map((field) => (
-              <option key={field} value={field}>
-                {field}
-              </option>
-            ))}
-          </select>
-
-          {errors.selectedJobField && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.selectedJobField}
-            </p>
-          )}
-        </div>
-
-        {/* Preferred Job - Second Dropdown */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold">
-            Preferred Job
-          </label>
-
-          <select
-            value={preferredJobField}
-            onChange={(e) =>
-              onChange("preferredJobField", e.target.value)
-            }
-            disabled={!selectedJobField}
-            className={`h-11 w-full rounded-xl border bg-white px-3 transition-all duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-900 ${
-              errors.preferredJobField
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                : "border-zinc-300 focus:border-black focus:ring-2 focus:ring-zinc-300 dark:border-zinc-700"
-            }`}
-          >
-            <option value="">
-              {selectedJobField
-                ? "Select Preferred Job"
-                : "First select Job Field"}
-            </option>
-
-            {availableJobs.map((job) => (
-              <option key={job} value={job}>
-                {job}
-              </option>
-            ))}
-          </select>
-
-          {errors.preferredJobField && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.preferredJobField}
-            </p>
-          )}
-        </div>
+        {/* Preferred Job - Searchable Dropdown */}
+        <SearchableSelect
+          id="preferred-job-field"
+          label="Preferred Job"
+          required
+          value={preferredJobField}
+          onChange={(val) => onChange("preferredJobField", val)}
+          options={availableJobs}
+          placeholder={
+            selectedJobField
+              ? "Select or search Preferred Job..."
+              : "First select a Job Field"
+          }
+          searchPlaceholder="Type to search Preferred Job (e.g. Manager, Chemist, Operator)..."
+          disabled={!selectedJobField}
+          disabledMessage="Please choose a Job Field first to see relevant job roles"
+          error={errors.preferredJobField}
+          emptyMessage="No preferred jobs found matching your search"
+        />
 
         {/* Experience */}
         <div>

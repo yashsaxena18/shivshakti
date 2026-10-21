@@ -7,7 +7,8 @@ import { Search, X } from "lucide-react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { jobCategories} from "@/lib/job-categories";
+import { jobCategories } from "@/lib/job-categories";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { CalendarDays } from "lucide-react";
 
 import {
@@ -21,6 +22,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+const getGeneralWaText = (candidate: any) => {
+  return `\u{1F4B3} *ONLINE PAYMENT REQUEST* \u{1F4B3}
+━━━━━━━━━━━━━━━━━━━━━
+Dear *${candidate.user?.fullName || "Candidate"}*,
+
+We are pleased to inform you that your profile has been processed successfully. To unlock exclusive job opportunities and proceed further with your application, please complete your Premium Candidate registration payment.
+
+*Payment Details:*
+\u{25AA}\u{FE0F} *Amount Due:* ₹499
+\u{25AA}\u{FE0F} *Service:* Premium Candidate
+
+\u{1F449} *Click below to pay securely via Razorpay:*
+\u{1F517} https://razorpay.me/@shivshaktimultiservice?amount=n%2FUUsdogj%2F7sarE2WD13qg%3D%3D
+
+\u{26A0}\u{FE0F} *Important Note:* Once the payment is completed, kindly reply to this message with a *screenshot of the payment receipt* for confirmation.
+
+\u{2B50} *We Value Your Feedback*
+\u{1F449} [Leave a Review: https://g.page/r/CZZBLKQak0G_EBE/review]
+
+Thank you! \u{1F91D}
+
+*Warm Regards,*
+*Shiv Shakti Multi Service*
+_Recruitment & Placement Services_
+━━━━━━━━━━━━━━━━━━━━━`;
+};
 
 function CandidatesContent() {
   const searchParams = useSearchParams();
@@ -470,7 +498,7 @@ Recruitment • Placement • Multi Services`;
 ━━━━━━━━━━━━━━━━━━━━━
 Dear *${onlinePayFor.user?.fullName || "Candidate"}*,
 
-We are pleased to inform you that your profile has been processed successfully. To proceed further, please complete your online payment.
+We are pleased to inform you that your profile has been processed successfully. To unlock exclusive job opportunities and proceed further with your application, please complete your Premium Candidate registration payment.
 
 *Payment Details:*
 \u{25AA}\u{FE0F} *Amount Due:* ₹${onlinePayForm.amount}
@@ -893,7 +921,7 @@ _Recruitment & Placement Services_
                                   </a>
 
                                   <a
-                                    href={`https://wa.me/91${candidate.phone}`}
+                                    href={`https://wa.me/91${candidate.phone}?text=${encodeURIComponent(getGeneralWaText(candidate))}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex w-fit items-center justify-center rounded-md bg-green-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-green-700"
@@ -1122,7 +1150,7 @@ _Recruitment & Placement Services_
                             </a>
 
                             <a
-                              href={`https://wa.me/91${candidate.phone}`}
+                              href={`https://wa.me/91${candidate.phone}?text=${encodeURIComponent(getGeneralWaText(candidate))}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex w-fit items-center justify-center rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700"
@@ -1445,36 +1473,43 @@ _Recruitment & Placement Services_
                 />
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-semibold">Job Category *</label>
-                <select
-                  required
-                  value={addForm.selectedJobField}
-                  onChange={(e) => setAddForm({ ...addForm, selectedJobField: e.target.value, preferredJobField: "" })}
-                  className="w-full rounded-xl border px-3 py-2 outline-none focus:border-black"
-                >
-                  <option value="">Select Category</option>
-                  {Object.keys(jobCategories).map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
+              <SearchableSelect
+                label="Job Category"
+                required
+                value={addForm.selectedJobField}
+                onChange={(val) =>
+                  setAddForm({
+                    ...addForm,
+                    selectedJobField: val,
+                    preferredJobField: "",
+                  })
+                }
+                options={Object.keys(jobCategories)}
+                placeholder="Select or search category..."
+                searchPlaceholder="Search category..."
+              />
 
-              <div>
-                <label className="mb-1 block text-sm font-semibold">Preferred Job *</label>
-                <select
-                  required
-                  disabled={!addForm.selectedJobField}
-                  value={addForm.preferredJobField}
-                  onChange={(e) => setAddForm({ ...addForm, preferredJobField: e.target.value })}
-                  className="w-full rounded-xl border px-3 py-2 outline-none focus:border-black"
-                >
-                  <option value="">Select Job</option>
-                  {addForm.selectedJobField && jobCategories[addForm.selectedJobField as keyof typeof jobCategories]?.map((job) => (
-                    <option key={job} value={job}>{job}</option>
-                  ))}
-                </select>
-              </div>
+              <SearchableSelect
+                label="Preferred Job"
+                required
+                disabled={!addForm.selectedJobField}
+                disabledMessage="Please select a Job Category first"
+                value={addForm.preferredJobField}
+                onChange={(val) =>
+                  setAddForm({ ...addForm, preferredJobField: val })
+                }
+                options={
+                  addForm.selectedJobField
+                    ? jobCategories[addForm.selectedJobField as keyof typeof jobCategories] || []
+                    : []
+                }
+                placeholder={
+                  addForm.selectedJobField
+                    ? "Select or search job..."
+                    : "First select a Job Category"
+                }
+                searchPlaceholder="Search preferred job..."
+              />
 
               <p className="text-xs text-zinc-500">
                 Default password will be set to: <strong>00000000</strong>
